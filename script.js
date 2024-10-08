@@ -1,3 +1,24 @@
+// Import the functions you need from the SDKs you need
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.12.0/firebase-app.js";
+import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.12.0/firebase-analytics.js";
+import { getFirestore, collection, addDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/9.12.0/firebase-firestore.js";
+
+// Your web app's Firebase configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyAqTkPtfaF69PlUMdEL3UBsk-h39JvLbts",
+  authDomain: "hambur-galactica.firebaseapp.com",
+  projectId: "hambur-galactica",
+  storageBucket: "hambur-galactica.appspot.com",
+  messagingSenderId: "61733671458",
+  appId: "1:61733671458:web:6505e45146bd5975c0707b",
+  measurementId: "G-ZGX6Y9WLNK"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
+const db = getFirestore(app);
+
 document.addEventListener('DOMContentLoaded', () => {
     const burger = document.querySelector('.burger');
     const nav = document.querySelector('.nav-links');
@@ -153,61 +174,70 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Botón "Ordenar ahora"
             menuDetalle.querySelector('.ordenar-btn').addEventListener('click', () => {
-                const mensaje = `Hola, me gustaría ordenar una ${hamburguesa.nombre}. Precio: ${hamburguesa.precio}\n\nImagen del producto: ${imagenes[id % 2]}`;
-                const whatsappLink = `https://wa.me/51934498803?text=${encodeURIComponent(mensaje)}`;
-                window.open(whatsappLink, '_blank');
+                alert(`¡Gracias por ordenar la ${hamburguesa.nombre}!`);
+                menuDetalle.remove();
             });
         }
     });
 
-    // Manejar envío del formulario de contacto
+    // Manejar envío de formulario de contacto
     const contactForm = document.getElementById('contactForm');
-    contactForm.addEventListener('submit', function(e) {
+    contactForm.addEventListener('submit', (e) => {
         e.preventDefault();
+        const nombre = contactForm.nombre.value;
+        const email = contactForm.email.value;
+        const mensaje = contactForm.mensaje.value;
 
-        emailjs.sendForm('service_2lfxcyj', 'template_uy8d2yd', this)
-            .then(function() {
-                alert('Mensaje enviado con éxito!');
+        emailjs.send("service_id", "template_id", {
+            from_name: nombre,
+            from_email: email,
+            message: mensaje
+        }).then(
+            function(response) {
+                console.log("SUCCESS", response);
+                alert("Mensaje enviado con éxito!");
                 contactForm.reset();
-            }, function(error) {
-                alert('Error al enviar el mensaje: ' + error);
-            });
+            },
+            function(error) {
+                console.log("FAILED", error);
+                alert("Error al enviar el mensaje. Por favor, intenta de nuevo.");
+            }
+        );
     });
 
-    // Cargar testimonios guardados
-    const testimonios = JSON.parse(localStorage.getItem('testimonios')) || [
-        { nombre: "María", testimonio: "¡Las mejores hamburguesas que he probado!" },
-        { nombre: "Juan", testimonio: "El ambiente es increíble, volveré pronto." },
-        { nombre: "Ana", testimonio: "Excelente servicio y comida deliciosa." }
-    ];
+    // Manejar envío de testimonios y mostrarlos en tiempo real
+    const testimonioForm = document.getElementById('testimonioForm');
+    testimonioForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const nombre = testimonioForm.nombre.value;
+        const testimonio = testimonioForm.testimonio.value;
 
-    function mostrarTestimonios() {
+        try {
+            await addDoc(collection(db, "testimonios"), {
+                nombre: nombre,
+                testimonio: testimonio,
+                fecha: new Date()
+            });
+            testimonioForm.reset();
+            alert("¡Gracias por tu testimonio!");
+        } catch (error) {
+            console.error("Error al añadir testimonio: ", error);
+            alert("Error al enviar el testimonio. Por favor, intenta de nuevo.");
+        }
+    });
+
+    // Escuchar cambios en tiempo real en los testimonios
+    onSnapshot(collection(db, "testimonios"), (snapshot) => {
         testimoniosContainer.innerHTML = '';
-        testimonios.forEach(testimonio => {
+        snapshot.forEach((doc) => {
+            const testimonioData = doc.data();
             const testimonioItem = document.createElement('div');
             testimonioItem.classList.add('testimonio-item');
             testimonioItem.innerHTML = `
-                <h3>${testimonio.nombre}</h3>
-                <p>${testimonio.testimonio}</p>
+                <p>"${testimonioData.testimonio}"</p>
+                <span>- ${testimonioData.nombre}</span>
             `;
             testimoniosContainer.appendChild(testimonioItem);
         });
-    }
-
-    mostrarTestimonios();
-
-    // Manejar envío de nuevo testimonio
-    const testimonioForm = document.getElementById('testimonioForm');
-    testimonioForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        const nombre = this.querySelector('input[name="nombre"]').value;
-        const testimonio = this.querySelector('textarea[name="testimonio"]').value;
-        
-        testimonios.push({ nombre, testimonio });
-        localStorage.setItem('testimonios', JSON.stringify(testimonios));
-        
-        mostrarTestimonios();
-        
-        this.reset();
     });
 });

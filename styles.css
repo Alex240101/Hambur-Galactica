@@ -291,7 +291,7 @@ section:hover {
 }
 
 .ver-mas {
-    display:  inline-block;
+    display: inline-block;
     margin-top: 1rem;
     padding: 0.5rem 1rem;
     background-color: var(--primary-color);
@@ -302,7 +302,7 @@ section:hover {
 }
 
 .ver-mas:hover {
-    background-color: var(--secondary-color);
+    background-color:  var(--secondary-color);
     color: var(--background-color);
 }
 

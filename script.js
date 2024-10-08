@@ -148,7 +148,7 @@ document.addEventListener('DOMContentLoaded', () => {
     menuContainer.addEventListener('click', (e) => {
         if (e.target.classList.contains('ver-mas')) {
             e.preventDefault();
-            const id = e.target.getAttribute('data-id');
+            const id =   e.target.getAttribute('data-id');
             const hamburguesa = hamburguesas[id];
             const menuDetalle = document.createElement('div');
             menuDetalle.classList.add('menu-detalle');
@@ -175,9 +175,8 @@ document.addEventListener('DOMContentLoaded', () => {
             // Botón "Ordenar ahora"
             menuDetalle.querySelector('.ordenar-btn').addEventListener('click', () => {
                 // Define el número de WhatsApp y el mensaje
-                const numeroWhatsApp = '+51934498803';
-                const cantidadSeleccionada = 1; // Aquí puedes cambiar la cantidad o obtenerla desde un input
-                const mensaje = `¡Gracias por ordenar la ${hamburguesa.nombre}!\nPrecio: ${hamburguesa.precio.replace('S/. ', '')}\nCantidad: ${cantidadSeleccionada}`;
+                const numeroWhatsApp = '51934498803';
+                const mensaje = `Hola, me gustaría ordenar la ${hamburguesa.nombre}. Precio: ${hamburguesa.precio}`;
 
                 // Crea la URL para redirigir a WhatsApp
                 const urlWhatsApp = `https://wa.me/${numeroWhatsApp}?text=${encodeURIComponent(mensaje)}`;
@@ -188,8 +187,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Opcional: Puedes eliminar el menú después de la orden
                 menuDetalle.remove();
             });
-
-
         }
     });
 

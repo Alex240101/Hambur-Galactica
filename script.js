@@ -174,9 +174,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Botón "Ordenar ahora"
             menuDetalle.querySelector('.ordenar-btn').addEventListener('click', () => {
-                alert(`¡Gracias por ordenar la ${hamburguesa.nombre}!`);
+                // Define el número de WhatsApp y el mensaje
+                const numeroWhatsApp = '+51934498803';
+                const mensaje = `¡Gracias por ordenar la ${hamburguesa.nombre}! \nPrecio: S/. ${hamburguesa.precio} \nCantidad: ${cantidadSeleccionada}`; // Cambia 'cantidadSeleccionada' por la variable que almacena la cantidad seleccionada
+
+                // Crea la URL para redirigir a WhatsApp
+                const urlWhatsApp = `https://wa.me/${numeroWhatsApp}?text=${encodeURIComponent(mensaje)}`;
+
+                // Redirige a WhatsApp
+                window.open(urlWhatsApp, '_blank');
+
+                // Opcional: Puedes eliminar el menú después de la orden
                 menuDetalle.remove();
             });
+
         }
     });
 

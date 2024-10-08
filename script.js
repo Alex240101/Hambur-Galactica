@@ -176,7 +176,8 @@ document.addEventListener('DOMContentLoaded', () => {
             menuDetalle.querySelector('.ordenar-btn').addEventListener('click', () => {
                 // Define el número de WhatsApp y el mensaje
                 const numeroWhatsApp = '+51934498803';
-                const mensaje = `¡Gracias por ordenar la ${hamburguesa.nombre}! \nPrecio: S/. ${hamburguesa.precio} \nCantidad: ${cantidadSeleccionada}`; // Cambia 'cantidadSeleccionada' por la variable que almacena la cantidad seleccionada
+                const cantidadSeleccionada = 1; // Aquí puedes cambiar la cantidad o obtenerla desde un input
+                const mensaje = `¡Gracias por ordenar la ${hamburguesa.nombre}!\nPrecio: ${hamburguesa.precio.replace('S/. ', '')}\nCantidad: ${cantidadSeleccionada}`;
 
                 // Crea la URL para redirigir a WhatsApp
                 const urlWhatsApp = `https://wa.me/${numeroWhatsApp}?text=${encodeURIComponent(mensaje)}`;
@@ -187,6 +188,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Opcional: Puedes eliminar el menú después de la orden
                 menuDetalle.remove();
             });
+
 
         }
     });
@@ -215,7 +217,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         );
     });
-    
 
     // Manejar envío de testimonios y mostrarlos en tiempo real
     const testimonioForm = document.getElementById('testimonioForm');

@@ -215,6 +215,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         );
     });
+    
 
     // Manejar envío de testimonios y mostrarlos en tiempo real
     const testimonioForm = document.getElementById('testimonioForm');

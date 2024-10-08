@@ -1,23 +1,24 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.12.0/firebase-app.js";
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.12.0/firebase-analytics.js";
-import { getFirestore, collection, addDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/9.12.0/firebase-firestore.js";
+import { getDatabase, ref, push, onChildAdded } from "https://www.gstatic.com/firebasejs/9.12.0/firebase-database.js";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyAqTkPtfaF69PlUMdEL3UBsk-h39JvLbts",
-  authDomain: "hambur-galactica.firebaseapp.com",
-  projectId: "hambur-galactica",
-  storageBucket: "hambur-galactica.appspot.com",
-  messagingSenderId: "61733671458",
-  appId: "1:61733671458:web:6505e45146bd5975c0707b",
-  measurementId: "G-ZGX6Y9WLNK"
+    apiKey: "AIzaSyAqTkPtfaF69PlUMdEL3UBsk-h39JvLbts",
+    authDomain: "hambur-galactica.firebaseapp.com",
+    databaseURL: "https://hambur-galactica-default-rtdb.firebaseio.com",
+    projectId: "hambur-galactica",
+    storageBucket: "hambur-galactica.appspot.com",
+    messagingSenderId: "61733671458",
+    appId: "1:61733671458:web:6505e45146bd5975c0707b",
+    measurementId: "G-ZGX6Y9WLNK"
 };
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
-const db = getFirestore(app);
+const db = getDatabase(app);
 
 document.addEventListener('DOMContentLoaded', () => {
     const burger = document.querySelector('.burger');
@@ -27,7 +28,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const menuContainer = document.querySelector('.menu-container');
     const galeriaContainer = document.querySelector('.galeria-container');
     const eventosContainer = document.querySelector('.eventos-container');
-    const testimoniosContainer = document.querySelector('.testimonios-container');
+    const testimoniosContainer = document.querySelector('#testimonios .testimonios-container');
 
     // Inicializar EmailJS
     emailjs.init("jD1Hs7P5wwDsHzM2m");
@@ -148,7 +149,7 @@ document.addEventListener('DOMContentLoaded', () => {
     menuContainer.addEventListener('click', (e) => {
         if (e.target.classList.contains('ver-mas')) {
             e.preventDefault();
-            const id =   e.target.getAttribute('data-id');
+            const id = e.target.getAttribute('data-id');
             const hamburguesa = hamburguesas[id];
             const menuDetalle = document.createElement('div');
             menuDetalle.classList.add('menu-detalle');
@@ -198,7 +199,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const email = contactForm.email.value;
         const mensaje = contactForm.mensaje.value;
 
-        emailjs.send("service_id", "template_id", {
+        emailjs.send("service_gts1f5z", "template_9m9lo6q", {
             from_name: nombre,
             from_email: email,
             message: mensaje
@@ -217,16 +218,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Manejar envío de testimonios y mostrarlos en tiempo real
     const testimonioForm = document.getElementById('testimonioForm');
+
     testimonioForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         const nombre = testimonioForm.nombre.value;
         const testimonio = testimonioForm.testimonio.value;
 
         try {
-            await addDoc(collection(db, "testimonios"), {
+            await push(ref(db, 'testimonios'), {
                 nombre: nombre,
                 testimonio: testimonio,
-                fecha: new Date()
+                fecha: new Date().toISOString()
             });
             testimonioForm.reset();
             alert("¡Gracias por tu testimonio!");
@@ -237,17 +239,14 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Escuchar cambios en tiempo real en los testimonios
-    onSnapshot(collection(db, "testimonios"), (snapshot) => {
-        testimoniosContainer.innerHTML = '';
-        snapshot.forEach((doc) => {
-            const testimonioData = doc.data();
-            const testimonioItem = document.createElement('div');
-            testimonioItem.classList.add('testimonio-item');
-            testimonioItem.innerHTML = `
-                <p>"${testimonioData.testimonio}"</p>
-                <span>- ${testimonioData.nombre}</span>
-            `;
-            testimoniosContainer.appendChild(testimonioItem);
-        });
+    onChildAdded(ref(db, 'testimonios'), (snapshot) => {
+        const testimonioData = snapshot.val();
+        const testimonioItem = document.createElement('div');
+        testimonioItem.classList.add('testimonio-item');
+        testimonioItem.innerHTML = `
+            <p>"${testimonioData.testimonio}"</p>
+            <span>- ${testimonioData.nombre}</span>
+        `;
+        testimoniosContainer.appendChild(testimonioItem);
     });
 });
